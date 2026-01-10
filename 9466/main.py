@@ -1,58 +1,39 @@
-s = []
-for i in input():
-    s.append(i)
+import sys
+sys.setrecursionlimit(10**5 + 100)
 
-c = None
-q = []
+t = int(input())
 
-for i in range(len(s)):
-    q.append(s[i])
+def solve():
+    n = int(input())
+    v = list(map(int, input().split()))
 
-    if s[i] == ")" or s[i] == "]":
-        c = s[i]
+    g = { i : [] for i in range(1, n + 1)}
+    for i in range(n):
+        g[i + 1].append(v[i])
 
-    if not c: continue
+    team = [0 for _ in range(n + 1)]
+    vis = [0 for _ in range(n + 1)]
+    cycle_found = [0]
 
-    m = None
+    def dfs(now, id):
+        vis[now] = id
 
-    if len(q) - 2 < 0: continue
+        for nxt in g[now]:
+            if vis[nxt] == 0:
+                dfs(nxt, id)
+            elif vis[nxt] == id:
+                cycle_found[0] = nxt
 
-    for j in range(len(q) - 2, -1, -1):
-        if q[j] not in "()[]": continue
+        if cycle_found[0] != 0:
+            team[now] = cycle_found[0]
+        if now == cycle_found[0]:
+            cycle_found[0] = 0
 
-        if (c == ")" and q[j] != "(") or (c == "]" and q[j] != "["):
-            print(0)
-            exit()
+    for i in range(1, n + 1):
+        cycle_found[0] = 0
+        if vis[i] == 0: dfs(i, i)
 
-        p = q[j:]
-        for _ in range(len(p)):
-            q.pop()
+    print(team.count(0) - 1)
 
-        val = 0
-        if len(p) == 2:
-            if p[0] == "(":
-                val = 2
-            else:
-                val = 3
-        else:
-            for k in p[1:-1]:
-                val += int(k)
-            if p[0] == "(":
-                val *= 2
-            else:
-                val *= 3
-
-        q.append(str(val))
-
-        c = None
-        break
-
-ans = 0
-for v in q:
-    if v in "()[]":
-        print(0)
-        exit()
-
-    ans += int(v)
-
-print(ans)
+for _ in range(t):
+    solve()

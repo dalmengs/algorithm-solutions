@@ -1,39 +1,43 @@
-import sys
-sys.setrecursionlimit(10**5 + 100)
+    import sys
+    sys.setrecursionlimit(10**5 + 100)
 
-t = int(input())
+    n, m, k = map(int, input().split())
+    c = [0] + list(map(int, input().split()))
 
-def solve():
-    n = int(input())
-    v = list(map(int, input().split()))
+    g = { i: [] for i in range(n + 1) }
 
-    g = { i : [] for i in range(1, n + 1)}
-    for i in range(n):
-        g[i + 1].append(v[i])
+    for _ in range(m):
+        a, b = map(int, input().split())
+        g[a].append(b)
+        g[b].append(a)
 
-    team = [0 for _ in range(n + 1)]
     vis = [0 for _ in range(n + 1)]
-    cycle_found = [0]
 
     def dfs(now, id):
         vis[now] = id
 
         for nxt in g[now]:
-            if vis[nxt] == 0:
-                dfs(nxt, id)
-            elif vis[nxt] == id:
-                cycle_found[0] = nxt
-
-        if cycle_found[0] != 0:
-            team[now] = cycle_found[0]
-        if now == cycle_found[0]:
-            cycle_found[0] = 0
+            if vis[nxt]: continue
+            dfs(nxt, id)
 
     for i in range(1, n + 1):
-        cycle_found[0] = 0
-        if vis[i] == 0: dfs(i, i)
+        if vis[i]: continue
+        dfs(i, i)
 
-    print(team.count(0) - 1)
+    group = {}
+    for i in range(1, n + 1):
+        group_id = vis[i]
+        if group_id not in group:
+            group[group_id] = [0, 0]
+        curr = group[group_id]
+        group[group_id] = [curr[0] + 1, curr[1] + c[i]]
 
-for _ in range(t):
-    solve()
+    data = [group[i] for i in group]
+    dp = [0 for _ in range(k)]
+
+    for i in group:
+        cap, cnt = group[i]
+        for p in range(k - 1, cap - 1, -1):
+            dp[p] = max(dp[p], dp[p - cap] + cnt)
+
+    print(max(dp))
