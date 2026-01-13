@@ -1,3 +1,1 @@
-0
-10
-12
+Input problem number: (Press ENTER to use problem number in `problem.txt`): [ERR] no executable file: 10 10 1000000000/main.py
